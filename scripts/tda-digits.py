@@ -10,6 +10,7 @@ import dionysus as ds
 import networkx as nx
 import numpy as np
 import matplotlib.pyplot as plt
+
 import pylab as pl
 from matplotlib import collections  as mc
 from sklearn.datasets import load_digits
