@@ -1,0 +1,2 @@
+# gitattributes
+*.ipynb linguist-detectable=false

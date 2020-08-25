@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-""" tda-digits.py: Topological features applied to the digits data set.
-author: Marko Lalovic <marko.lalovic@yahoo.com>
-license: MIT License
+""" tda_digits.py: Topological features applied to the digits data set.
+
+Author: Marko Lalovic <marko.lalovic@yahoo.com>
+License: MIT License
 """
 
 from __future__ import print_function   # if you are using Python 2
@@ -10,76 +11,53 @@ import dionysus as ds
 import networkx as nx
 import numpy as np
 import matplotlib.pyplot as plt
-
 import pylab as pl
 from matplotlib import collections  as mc
 from sklearn.datasets import load_digits
+from skimage.morphology import skeletonize
 
+from drawing_module import *
 
-def get_simplices(B, sweep_direction, show=False):
+CANVAS_WIDTH = 10
+CANVAS_HEIGHT = 10
+M = 28 # MNIST handwritten digits images are 28x28
+
+def get_simplices(emb_graph, show=False):
     ''' Constructs a simplex stream for computing the persistent homology
     using the filtration on the vertices of the graph G corresponding to
     the pixels of the image B.
 
     Filtration is the following. We are adding the vertices and edges to
     the graph G as we sweep across the image B in sweep_direction.
-    In this way we get spatial information from the image B.
-
-    Args:
-        B::numpy.ndarray
-            Assumed to be a binary image of a handwritten digit.
-        sweep_direction::str
-            Assumed to be 'right', 'left', 'top' or 'bottom'.
-        show::bool
-            Set to True, if you want to see the sweeping filtration process
-
-    Returns:
-        simplices::list
-            In the form of (simplex, time) for example:
-                [([0], 1), ([1], 2), ([2], 2), ([0, 1], 2), ... ([5, 6], 5)]
-    '''
-    m = B.shape[0]
-
-    if sweep_direction in ['right', 'top']:
-        sweep_range = range(1, m + 1)
-    else: # left, top
-        sweep_range = range(m - 1, -1, -1)
-
+    In this way we get spatial information from the image B.'''
     simplices = []
-    time = 1
-    for sweep_line in sweep_range:
-        C = np.zeros((m, m))
 
-        if sweep_direction == 'right':
-            C[:, 0:sweep_line] = B[:, 0:sweep_line]
-        elif sweep_direction == 'left':
-            C[:, sweep_line:m] = B[:, sweep_line:m]
-        elif sweep_direction == 'bottom':
-            C[sweep_line:m, :] = B[sweep_line:m, :]
-        else:
-            C[0:sweep_line, :] = B[0:sweep_line, :]
+    number_of = {}
+    for i in range(emb_graph.n):
+        node = emb_graph.nodes[i]
+        simplices.append( ([i], node.time) )
+        number_of[node] = i
 
-        if np.nonzero(C): # nothing to add if C is empty
-            adj_mat = get_adj_mat_from(C, sweep_direction)
+    for edge in emb_graph.edges:
+        u = number_of[edge.p1]
+        v = number_of[edge.p2]
+        simplices.append( ([u, v], edge.time) )
 
-            if show:
-                plt.imshow(C)
-                plt.title('Image at sweep line: ' + str(sweep_line))
-                plt.show()
-                G = get_graph(adj_mat, show=True)
+    if show:
+        graph_nx = nx.Graph()
 
-            # add vertices
-            for i in range(adj_mat.shape[0]):
-                if [i] not in [vertices[0] for vertices in simplices]:
-                    simplices.append( ([i], time) )
+        for simplex, time in simplices:
+            if len(simplex) == 1:
+                graph_nx.add_node(simplex[0])
+            else:
+                edge = (simplex[0], simplex[1])
+                graph_nx.add_edge(*edge)
 
-            # add edges
-            for i in range(adj_mat.shape[0]):
-                for j in range(i+1, adj_mat.shape[1]):
-                        if adj_mat[i, j] > 0 and \
-                            [i, j] not in [vertices[0] for vertices in simplices]:
-                            simplices.append( ([i, j], time) )
-        time += 1 # increase the time of filtration
+        pos = nx.spring_layout(graph_nx)
+        # pos = nx.fruchterman_reingold_layout(graph_nx)
+        nx.draw(graph_nx, pos, font_size=10,
+                node_color='steelblue', with_labels=True)
+        plt.show()
 
     return simplices
 
@@ -96,8 +74,8 @@ def get_betti_barcodes(simplices):
                 {0: [[1.0, inf]], 1: [[3.0, inf], [5.0, inf]]}
     '''
     flt = ds.Filtration()
-    for vertices, time in simplices:
-        flt.append(ds.Simplex(vertices, time))
+    for simplex, time in simplices:
+        flt.append(ds.Simplex(simplex, time))
 
     flt.sort()
     homp = ds.homology_persistence(flt)
@@ -116,9 +94,9 @@ def get_betti_barcodes(simplices):
     return intervals
 
 def get_adj_mat_from(B, sweep_direction):
-    ''' Constructs a graph G in the form of adjacency matrix given the image B in the
-    following way. Graph construction is the following. We treat the pixels as
-    vertices and add edges between adjacent pixels (including diagonal neighbours).
+    ''' Constructs a graph G in the form of adjacency matrix given the points.
+    Graph construction is the following. We treat the pixels as vertices and
+    add edges between adjacent pixels (including diagonal neighbours).
 
     Args:
         B::numpy.ndarray
@@ -178,73 +156,60 @@ def get_graph(adj_mat, show=False):
 
     return G
 
-def neighbours(p, q):
-    ''' Tests if pixels from some image are neighbours including diagonally.
+def get_points_from_image(n=17, show=False, show_original=False):
+    ''' Performs the following steps:
+    (a) load the image of a handwritten digit from MNIST dataset;
+    (b) transform to a binary image by thresholding;
+    (c) reduce the binary image to 1 pixel width to expose its topology.
+    (d) transform the pixels to points
 
-    Args:
-        p::tuple
-            Coordinate of a pixel for which we calculate the neighbourhood.
-        q::tuple
-            Coordinate of a pixel for which we test if it is in the neighbourhood.
-
-    Returns:
-        bool
-            If pixel q is in the neighbourhood of pixel p.
-    '''
-    list1 = list(range(p[0] - 1, p[0] + 2))
-    list2 = list(range(p[1] - 1, p[1] + 2))
-    nbd = [(i, j) for i in list1 for j in list2]
-    return q in nbd
-
-def get_example(show=False):
-    ''' Example image of handwritten image of number 8. Eroded such that the
-    width of the curve is 1 pixel.
-
-    Args:
-        show::bool
-            Set to True, if you want to see the image.
-
-    Returns:
-        A::numpy.ndarray
-            The image.
-    '''
-    coords = [[0, 2], [1, 1], [1, 3], [2, 2], [3, 1], [3, 3], [4, 2]]
-    m = 5
-    A = np.zeros((m, m))
-    for coord in coords:
-        A[coord[0], coord[1]] = 1
-
-    if show:
-        plt.imshow(A)
-        plt.title('Example image of number 8')
-        plt.show()
-
-    return A
-
-def get_number(n=8, show=False):
-    ''' To load the image of a handwritten digit from Scikit-learn dataset of
-    1797 8x8 images.
+    The Zhang-Suen Thinning algorithm is used in step (c).
 
     Args:
         n::int
-            The number of the handwritten digit image we want.
+            The number of the handwritten digit image we want,
+            e.g. n = 17 for image of number 8.
         show::bool
             Set True, if you want to see the image.
 
     Returns:
-        A::numpy.ndarray
-            The image of the handwritten digit.
+        points::PointList
+            The points of the skeleton of the handwritten digit of a number
+            as a list of Point objects.
     '''
-
-    digits = load_digits()
-    A = digits.images[n]
-
-    if show:
+    # (a)
+    X = np.load('../data/X_100.npy', allow_pickle=True)
+    y = np.load('../data/y_100.npy', allow_pickle=True)
+    A = X[n]
+    A = A.reshape((M, M))
+    if show_original:
         plt.imshow(A)
-        plt.title('Handwritten digit of number ' + str(n%10))
+        plt.title('Original image of number ' + y[n])
         plt.show()
 
-    return A
+    # (b)
+    B = binarize(A)
+    B = B.astype(bool)
+
+    # (c)
+    C = skeletonize(B)
+    C = C.astype(int)
+
+    # (d)
+    C = np.flipud(C)
+    C = C.transpose()
+
+    coords = C.nonzero()
+    coords = list(zip(coords[0], coords[1]))
+    points = [Point(coords[i][0], coords[i][1]) for i in range(len(coords))]
+
+    if show:
+        title = 'Skeleton of the handwritten digit of number ' + y[n]
+        canvas = Canvas(title)
+        draw_points(canvas, points)
+        canvas.show()
+
+    return PointList(points)
 
 def binarize(A, threshold=0, show=False):
     ''' Produce the binary image B by thresholding the input image A.
@@ -264,7 +229,7 @@ def binarize(A, threshold=0, show=False):
 
     B = np.copy(A)
     if threshold == 0:
-        threshold = np.mean(A)/2
+        threshold = np.mean(A)
     B[B <= threshold] = 0
     B[B > threshold] = 1
 
@@ -327,24 +292,26 @@ def draw_betti_barcodes(intervals, xlim):
 
 
 if __name__ == "__main__":
-    use_example = True
     sweep_direction = 'top'
+    # for right: transpose image
+    # for left: transpose and flipud
+    # for bottom: flipud
 
-    if use_example:
-        B = get_example(show=True)
-    else:
-        A = get_number(n=8, show=True)
-        B = binarize(A, show=True)
+    point_list = get_points_from_image(n=17,
+                                       show=True,
+                                       show_original=False)
 
-    m = B.shape[0]
-    adj_mat = get_adj_mat_from(B, sweep_direction)
-    G = get_graph(adj_mat, show=True)
+    emb_graph = point_list.get_emb_graph()
+    canvas = Canvas('Embedded graph')
+    draw_graph(canvas, emb_graph)
+    canvas.show()
 
-    simplices = get_simplices(B, sweep_direction) # show=True, to see the filtration
+    simplices = get_simplices(emb_graph, show=True)
     intervals = get_betti_barcodes(simplices)
-    draw_betti_barcodes(intervals, 2*m)
+    draw_betti_barcodes(intervals, M)
 
     # TODO:
     # for sweep_direction in ['right', 'left', 'top', 'bottom']:
     #   extract features:
-    #   4 sweeps and Betti 0, Betti 1 barcodes = 8 features vectors per image
+    #    from Betti 0 and Betti 1 barcodes
+    # 4 sweeps * 2 dimensions = 8 features vectors per image
