@@ -55,8 +55,11 @@ def get_simplices(emb_graph, show=False):
 
         pos = nx.spring_layout(graph_nx)
         # pos = nx.fruchterman_reingold_layout(graph_nx)
-        nx.draw(graph_nx, pos, font_size=10,
-                node_color='steelblue', with_labels=True)
+        nx.draw(graph_nx,
+                pos,
+                font_size=10,
+                node_color='steelblue',
+                with_labels=True)
         plt.show()
 
     return simplices
@@ -156,62 +159,33 @@ def get_graph(adj_mat, show=False):
 
     return G
 
-def get_points_from_image(n=17, show=False, show_original=False):
-    ''' Performs the following steps:
-    (a) load the image of a handwritten digit from MNIST dataset;
-    (b) transform to a binary image by thresholding;
-    (c) reduce the binary image to 1 pixel width to expose its topology.
-    (d) transform the pixels to points
-
-    The Zhang-Suen Thinning algorithm is used in step (c).
+def get_image(n=17, show=False):
+    ''' Loads the image of a handwritten digit from MNIST dataset.
 
     Args:
         n::int
             The number of the handwritten digit image we want,
             e.g. n = 17 for image of number 8.
         show::bool
-            Set True, if you want to see the image.
+            Set True, if you want to see the loaded image.
 
     Returns:
-        points::PointList
-            The points of the skeleton of the handwritten digit of a number
-            as a list of Point objects.
+        image::numpy.ndarray
+            Array of size MxM.
     '''
-    # (a)
     X = np.load('../data/X_100.npy', allow_pickle=True)
     y = np.load('../data/y_100.npy', allow_pickle=True)
-    A = X[n]
-    A = A.reshape((M, M))
-    if show_original:
-        plt.imshow(A)
+    image = X[n]
+    image = image.reshape((M, M))
+
+    if show:
+        plt.imshow(image, cmap='gray')
         plt.title('Original image of number ' + y[n])
         plt.show()
 
-    # (b)
-    B = binarize(A)
-    B = B.astype(bool)
+    return image
 
-    # (c)
-    C = skeletonize(B)
-    C = C.astype(int)
-
-    # (d)
-    C = np.flipud(C)
-    C = C.transpose()
-
-    coords = C.nonzero()
-    coords = list(zip(coords[0], coords[1]))
-    points = [Point(coords[i][0], coords[i][1]) for i in range(len(coords))]
-
-    if show:
-        title = 'Skeleton of the handwritten digit of number ' + y[n]
-        canvas = Canvas(title)
-        draw_points(canvas, points)
-        canvas.show()
-
-    return PointList(points)
-
-def binarize(A, threshold=0, show=False):
+def get_binary_image(image, threshold=0, show=False):
     ''' Produce the binary image B by thresholding the input image A.
 
     Args:
@@ -220,25 +194,85 @@ def binarize(A, threshold=0, show=False):
         threshold::float
             The threshold for binarization. Default is mean(A)/2.
         show::bool
-            Set True, if you want to see the result.
+            Set True, if you want to see the binary image.
 
     Returns:
         B::numpy.ndarray
             The binary image of the handwritten digit.
     '''
 
-    B = np.copy(A)
     if threshold == 0:
-        threshold = np.mean(A)
-    B[B <= threshold] = 0
-    B[B > threshold] = 1
+        threshold = np.mean(image)
+    image[image <= threshold] = 0
+    image[image > threshold] = 1
 
     if show:
-        plt.imshow(B)
+        plt.imshow(image)
         plt.title('Binary image')
         plt.show()
 
-    return B
+    return image
+
+def get_skeleton(binary_image, show=False):
+    ''' Reduces the binary image to 1 pixel width to expose its topology
+    using the Zhang-Suen Thinning algorithm.
+
+    Args:
+        image::numpy.ndarray
+            Array of binary image.
+        show::bool
+            Set True, if you want to see the skeleton of the image.
+
+    Returns:
+        skeleton::numpy.ndarray
+            Array of the skeleton of the input image.
+    '''
+    binary_image = binary_image.astype(bool)
+    skeleton = skeletonize(binary_image)
+    skeleton = skeleton.astype(int)
+
+    if show:
+        plt.imshow(skeleton)
+        plt.title('Skeleton of the image')
+        plt.show()
+
+    return skeleton
+
+def get_points(skeleton, sweep_direction='top', show=False):
+    ''' Transforms the pixels of skeleton to points.
+
+    Args:
+        skeleton::numpy.ndarray
+            Array of skeleton.
+        sweep_direction::str
+            Assumed to be 'right', 'left', 'top' or 'bottom'.
+        show::bool
+            Set True, if you want to see the points.
+
+    Returns:
+        points::list
+            The points of the skeleton of the handwritten digit of a number
+            as a list of Point objects.
+    '''
+    # transpose and flip the image matrix according to the sweep directions
+    if sweep_direction == 'top':
+        skeleton = np.flipud(skeleton)
+        skeleton = skeleton.transpose()
+    elif sweep_direction == 'bottom':
+        skeleton = skeleton.transpose()
+    elif sweep_direction == 'right':
+        skeleton = np.flipud(skeleton)
+
+    coords = skeleton.nonzero()
+    coords = list(zip(coords[0], coords[1]))
+    points = [Point(coords[i][0], coords[i][1]) for i in range(len(coords))]
+
+    if show:
+        canvas = Canvas('Points of the skeleton')
+        draw_points(canvas, points)
+        canvas.show()
+
+    return points
 
 def draw_betti_barcodes(intervals, xlim):
     ''' Draws the Betti barcodes for dimensions 0 and 1.
@@ -292,15 +326,14 @@ def draw_betti_barcodes(intervals, xlim):
 
 
 if __name__ == "__main__":
-    sweep_direction = 'top'
-    # for right: transpose image
-    # for left: transpose and flipud
-    # for bottom: flipud
+    sweep_direction='top'
 
-    point_list = get_points_from_image(n=17,
-                                       show=True,
-                                       show_original=False)
+    image = get_image(n=17, show=True)
+    binary_image = get_binary_image(image, show=True)
+    skeleton = get_skeleton(binary_image, show=True)
+    points = get_points(skeleton, sweep_direction, show=True)
 
+    point_list = PointList(points)
     emb_graph = point_list.get_emb_graph()
     canvas = Canvas('Embedded graph')
     draw_graph(canvas, emb_graph)
