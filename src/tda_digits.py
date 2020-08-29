@@ -15,12 +15,15 @@ import pylab as pl
 from matplotlib import collections  as mc
 from sklearn.datasets import load_digits
 from skimage.morphology import skeletonize
+import math
 
 from drawing_module import *
 
-CANVAS_WIDTH = 10
-CANVAS_HEIGHT = 10
-M = 28 # MNIST handwritten digits images are 28x28
+n_samples = 10000 # number of loaded MNIST handwritten digits
+n_features = 32 # number of features per image
+image_size = 28 # MNIST handwritten digits images are 28x28
+data_X = np.load('../data/X_' + str(n_samples) + '.npy', allow_pickle=True)
+data_y = np.load('../data/y_'  + str(n_samples) + '.npy', allow_pickle=True)
 
 def get_simplices(emb_graph, show=False):
     ''' Constructs a simplex stream for computing the persistent homology
@@ -54,7 +57,6 @@ def get_simplices(emb_graph, show=False):
                 graph_nx.add_edge(*edge)
 
         pos = nx.spring_layout(graph_nx)
-        # pos = nx.fruchterman_reingold_layout(graph_nx)
         nx.draw(graph_nx,
                 pos,
                 font_size=10,
@@ -64,7 +66,7 @@ def get_simplices(emb_graph, show=False):
 
     return simplices
 
-def get_betti_barcodes(simplices):
+def get_betti_barcodes(simplices, show=False):
     ''' Computes the persistent homology given the simplex stream and
     persistence diagram.
 
@@ -88,38 +90,16 @@ def get_betti_barcodes(simplices):
     intervals[0] = [] # Betti 0 barcodes
     intervals[1] = [] # Betti 1 barcodes
     for i, dgm in enumerate(dgms):
-        print('Betti', i)
+        if show:
+            print('Betti', i)
         for pt in dgm:
             intervals[i].append([pt.birth, pt.death])
-            print('(', pt.birth, ', ', pt.death, ')', sep='')
-        print()
+            if show:
+                print('(', pt.birth, ', ', pt.death, ')', sep='')
+        if show:
+            print()
 
     return intervals
-
-def get_adj_mat_from(B, sweep_direction):
-    ''' Constructs a graph G in the form of adjacency matrix given the points.
-    Graph construction is the following. We treat the pixels as vertices and
-    add edges between adjacent pixels (including diagonal neighbours).
-
-    Args:
-        B::numpy.ndarray
-            Assumed to be a binary image of a handwritten digit.
-        sweep_direction::str
-            Assumed to be 'right', 'left', 'top' or 'bottom'.
-
-    Returns:
-        adj_mat::numpy.ndarray
-            Adjacency matrix of the graph G.
-    '''
-    ics, jcs = np.nonzero(B)
-    n = len(ics)
-    adj_mat = np.zeros((n, n))
-    # TODO: this is for sweep_direction='top', add other 3 sweep directions
-    for i in range(n):
-        for j in range(n):
-            if neighbours( (ics[i], jcs[i]), (ics[j], jcs[j]) ):
-                adj_mat[i, j] = 1
-    return adj_mat
 
 def get_graph(adj_mat, show=False):
     ''' Transforms the given adjacency matrix representation of a graph to
@@ -171,16 +151,15 @@ def get_image(n=17, show=False):
 
     Returns:
         image::numpy.ndarray
-            Array of size MxM.
+            Array of size image_size x image_size.
     '''
-    X = np.load('../data/X_100.npy', allow_pickle=True)
-    y = np.load('../data/y_100.npy', allow_pickle=True)
-    image = X[n]
-    image = image.reshape((M, M))
+    image = data_X[n]
+    image = image.reshape((image_size, image_size))
 
     if show:
-        plt.imshow(image, cmap='gray')
-        plt.title('Original image of number ' + y[n])
+        inverted = np.array(list(map(lambda x: 255.0 - x , image)))
+        plt.imshow(inverted, cmap='gray')
+        plt.title('Original image of number ' + data_y[n])
         plt.show()
 
     return image
@@ -207,7 +186,7 @@ def get_binary_image(image, threshold=0, show=False):
     image[image > threshold] = 1
 
     if show:
-        plt.imshow(image)
+        plt.imshow(~image.astype(bool), cmap='gray')
         plt.title('Binary image')
         plt.show()
 
@@ -232,7 +211,7 @@ def get_skeleton(binary_image, show=False):
     skeleton = skeleton.astype(int)
 
     if show:
-        plt.imshow(skeleton)
+        plt.imshow(~skeleton.astype(bool), cmap='gray')
         plt.title('Skeleton of the image')
         plt.show()
 
@@ -324,27 +303,131 @@ def draw_betti_barcodes(intervals, xlim):
 
     pl.show()
 
+def show_example(n=17):
+    ''' Shows example of feature extraction for image of number 8.'''
+    sweep_direction='left'
 
-if __name__ == "__main__":
-    sweep_direction='top'
-
-    image = get_image(n=17, show=True)
+    image = get_image(n, show=True)
     binary_image = get_binary_image(image, show=True)
     skeleton = get_skeleton(binary_image, show=True)
+
     points = get_points(skeleton, sweep_direction, show=True)
 
     point_list = PointList(points)
-    emb_graph = point_list.get_emb_graph()
-    canvas = Canvas('Embedded graph')
-    draw_graph(canvas, emb_graph)
-    canvas.show()
+    emb_graph = point_list.get_emb_graph(show=True)
 
     simplices = get_simplices(emb_graph, show=True)
-    intervals = get_betti_barcodes(simplices)
-    draw_betti_barcodes(intervals, M)
 
-    # TODO:
+    intervals = get_betti_barcodes(simplices)
+    draw_betti_barcodes(intervals, image_size)
+
+    f0 = extract_features(intervals[0])
+    f1 = extract_features(intervals[1])
+    features = f0 + f1
+    print(features)
+
+def extract_features(intervals):
+    ''' Extracts 4 features:
+        	sum_i { x_i * (y_i - x_i) }
+        	sum_i { (y_max - y_i) * (y_i - x_i) }
+        	sum_i { x_i^2 * (y_i - x_i)^4 }
+        	sum_i { (y_max - y_i)^2 * (y_i - x_i)^4 }
+    From the barcode intervals:
+        (x1, y1), (x2, y2), ..., (x_n, y_n);
+
+    Args:
+        intervals::list
+            Betti barcode intervals, for example: [[3.0, inf], [5.0, inf]]
+    Returns:
+        features::list
+            The 4 computed features.
+    '''
+    xs = []
+    ys = []
+    for interval in intervals:
+        x = interval[0]
+        y = interval[1]
+        if str(y) == 'inf': # replace the inf with image_size
+            y = image_size
+        xs.append(x)
+        ys.append(y)
+
+    f1, f2, f3, f4 = 0., 0., 0., 0.
+    for i in range(len(xs)):
+        f1 += xs[i] * (ys[i] - xs[i])
+        f2 += (max(ys) - ys[i]) * (ys[i] - xs[i])
+        f3 += math.pow(xs[i], 2) * math.pow(ys[i] - xs[i], 4)
+        f4 += math.pow(max(ys) - ys[i], 2) * math.pow(ys[i] - xs[i], 4)
+
+    return [f1, f2, f3, f4]
+
+def extract_all_features(n):
+    ''' Extracts features of nth image, all together:
+            4 sweeps * (2 barcodes * 4 features) = 32 features
+
+        Args:
+            n::int
+                The number of the handwritten digit image, for example:
+                    n = 17 for image of number 8.
+
+        Returns:
+            all_features::list
+                The 32 computed features.
+    '''
+    image = get_image(n)
+    binary_image = get_binary_image(image)
+    skeleton = get_skeleton(binary_image)
+
+    all_features = []
+    for sweep_direction in ['right', 'left', 'top', 'bottom']:
+        points = get_points(skeleton, sweep_direction)
+        point_list = PointList(points)
+        emb_graph = point_list.get_emb_graph()
+        simplices = get_simplices(emb_graph)
+        intervals = get_betti_barcodes(simplices)
+
+        f0 = extract_features(intervals[0])
+        f1 = extract_features(intervals[1])
+        features = f0 + f1
+        all_features += features
+
+    return all_features
+
+def save_features_matrix(n_samples = 10000):
+    ''' Saves the feature matrix of shape (n_samples, n_features) to ../data
+    directory.
+
+    Args:
+        n_samples::int
+            Number of samples of handwritten digit images.
+    '''
+    df = np.zeros((n_samples, n_features))
+
+    # extract all features of each image and save it to an array
+    for n in range(n_samples):
+        df[n] = extract_all_features(n)
+
+    np.save('../data/' + 'features_' + str(n_samples) + '.npy', df)
+
+
+if __name__ == "__main__":
+    show_example(n=17)
     # for sweep_direction in ['right', 'left', 'top', 'bottom']:
+    # sweep_direction='top'
+    #
+    # image = get_image(n=17, show=True)
+    # binary_image = get_binary_image(image, show=True)
+    # skeleton = get_skeleton(binary_image, show=True)
+    # points = get_points(skeleton, sweep_direction, show=True)
+    #
+    # point_list = PointList(points)
+    # emb_graph = point_list.get_emb_graph(show=True)
+    #
+    # simplices = get_simplices(emb_graph, show=True)
+    #
+    # intervals = get_betti_barcodes(simplices)
+    # draw_betti_barcodes(intervals, image_size)
+
     #   extract features:
     #    from Betti 0 and Betti 1 barcodes
     # 4 sweeps * 2 dimensions = 8 features vectors per image

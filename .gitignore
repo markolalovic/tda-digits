@@ -1,2 +1,4 @@
 # gitignore
 .ipynb_checkpoints
+data/X_10000.npy
+data/y_10000.npy
