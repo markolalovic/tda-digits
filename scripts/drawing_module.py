@@ -93,10 +93,10 @@ class PointList:
             canvas.show()
 
         if save:
-            canvas = Canvas('Embedded graph')
+            canvas = Canvas('')
             draw_graph(canvas, emb_graph)
             print('Saving to ../figures: 4_embedded-graph.png')
-            plt.savefig('../figures/4_embedded-graph.png')                        
+            plt.savefig('../figures/4_embedded-graph.png')
 
 
         return emb_graph

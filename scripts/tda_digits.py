@@ -187,7 +187,6 @@ def get_image(n=17, show=False, save=False):
     if save:
         inverted = np.array(list(map(lambda x: 255.0 - x , image)))
         plt.imshow(inverted, cmap='gray')
-        plt.title('Original image of number ' + data_y[n])
         print('Saving to ../figures: 0_original-image.png')
         plt.savefig('../figures/0_original-image.png')
 
@@ -221,7 +220,6 @@ def get_binary_image(image, threshold=0, show=False, save=False):
 
     if save:
         plt.imshow(~image.astype(bool), cmap='gray')
-        plt.title('Binary image')
         print('Saving to ../figures: 1_binary-image.png')
         plt.savefig('../figures/1_binary-image.png')
 
@@ -252,7 +250,6 @@ def get_skeleton(binary_image, show=False, save=False):
 
     if save:
         plt.imshow(~skeleton.astype(bool), cmap='gray')
-        plt.title('Skeleton of the image')
         print('Saving to ../figures: 2_skeleton.png')
         plt.savefig('../figures/2_skeleton.png')
 
@@ -293,7 +290,7 @@ def get_points(skeleton, sweep_direction='top', show=False, save=False):
         canvas.show()
 
     if save:
-        canvas = Canvas('Points of the skeleton')
+        canvas = Canvas('')
         draw_points(canvas, points)
         print('Saving to ../figures: 3_points.png')
         plt.savefig('../figures/3_points.png')
@@ -465,4 +462,4 @@ def save_features_matrix(n_samples=1000):
 
 if __name__ == '__main__':
     example(save=True)
-    save_features_matrix()
+    # save_features_matrix()
