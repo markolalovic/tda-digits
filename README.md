@@ -6,19 +6,19 @@ The main problem we are trying to solve is how to extract the topological featur
 
 From each image we first construct a graph, where pixels of the image correspond to vertices of the graph and we add edges between adjacent pixels.
 
-A pure topological classification cannot distinguish between individual numbers, as the numbers are topologically too similar. For example numbers 1, 2 and 3 are topologically the same if we use this style for writing numbers. Persistent homology, however gives us more information.
+A pure topological classification cannot distinguish between individual numbers, as the numbers are topologically too similar. For example numbers 1, 2 and 3 are topologically the same if we use this style for writing numbers. Persistent homology, however, gives us more information.
 
 We define a filtration on the vertices of the graph corresponding to the image pixels, adding vertices and edges as we sweep across the image in vertical or horizontal direction. This adds spatial information to the topological features. For example, though 6 and 9 both have a single loop, it will appear at different locations in the filtration.
 
 We then compute the persistent homology given the simplex stream from the filtration to get the so-called Betti barcodes. The persistent homology was computed using computational topology package [Dionysus 2](https://github.com/mrzv/dionysus), for more about the package see [2].
 
-Betti k barcode is a finite set of intervals. Each interval represents the first filtration level where the topological feature of dimension k appears and the filtration level where it disappears. This are called birth and death times of the topological feature.
+The Betti k barcode is a finite set of intervals. Each interval represents the first filtration level where the topological feature of dimension k appears and the filtration level where it disappears. This are called birth and death times of the topological feature.
 
-A connected component (or connected cluster of points) is 0 dimensional feature and a cycle (or loop) is 1 dimensional feature.
+A connected component (or connected cluster of points) is a 0 dimensional feature and a cycle (or loop) is a 1 dimensional feature.
 
 We extract 4 features from k-dimensional barcode from the invariants discussed in [1]. For each of 4 sweep directions: top, bottom, right, left and dimensions 0 and 1 we compute 4 features. This gives us a total of 32 features per image. We extract the features from a set of images and then apply a support vector machine (SVM) to classify the images.
 
-We show an example of applying this techinque on one image of a handwritten digit and then give the empirical classification results on a subset of the MNIST database.
+We show an example of applying this technique on one image of a handwritten digit and then give the empirical classification results on a subset of the MNIST database.
 
 
 ## Extraction of topological features from handwritten digits
@@ -49,15 +49,15 @@ For each of 4 sweep directions: top, bottom, right, left and for each k-dimensio
 
 To create a data set for the input to a standard machine learning algorithm, we extracted topological features for 10000 images of handwritten digits. We split the data set 50:50 in train and test set so each one had 5000 examples and classified the images only based on extracted topological features using SVM with RBF kernel.
 
-Accuracy on the train set using 10-fold cross validation was 0.88 (+/- 0.05). Accuracy on the test set was 0.89. We examined the common misclassifications. There were 3 examples of number 2 being mistaken for number 0 shown in Figure 3, because the number 2 was written with a loop.
+Accuracy on the train set using 10-fold cross validation was 0.88 (+/- 0.05). Accuracy on the test set was 0.89. We examined the common misclassifications. There were 3 examples of the number 2 being mistaken for number 0 shown in Figure 3, because the number 2 was written with a loop.
 
 <img src="figures/figure3-miss.png" alt="Number 2 being mistaken as number 0." width="600">
 
-For number 5 we got the lowest F1 score of 0.75. It was misclassified as 2 in 32 examples in test set. First 3 examples are shown in Figure 4. This was expected since these numbers are topologically the same with no topological features (e.g. loops) appearing in different different regions.
+For number 5 we got the lowest F1 score of 0.75. It was misclassified as 2 in 32 examples in the test set. First 3 examples are shown in Figure 4. This was expected since these numbers are topologically the same with no topological features (e.g. loops) appearing in different different regions.
 
 <img src="figures/figure4-miss.png" alt="Number 5 being mistaken as number 2." width="600">
 
-Number 8 was misclassfied as 4 in 21 examples from test set. First 3 examples are shown in Figure 5. From Figure 5 we see the stylistic problems that caused the missclassifications. The top loop of number 8 was not closed which made it topologically more similar to number 4 written with a loop.
+Number 8 was misclassfied as 4 in 21 examples from the test set. First 3 examples are shown in Figure 5. From Figure 5 we see the stylistic problems that caused the missclassifications. The top loop of number 8 was not closed which made it topologically more similar to number 4 written with a loop.
 
 <img src="figures/figure5-miss.png" alt="Number 2 being mistaken as number 0." width="600">
 
