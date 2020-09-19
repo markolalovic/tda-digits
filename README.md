@@ -62,6 +62,26 @@ Number 8 was misclassfied as 4 in 21 examples from the test set. First 3 example
 <img src="figures/figure5-miss.png" alt="Number 2 being mistaken as number 0." width="600">
 
 
+## How-to
+Dependencies:
+* Python (2 or 3)
+* Dionysus 2 for computing persistent homology
+* Boost version 1.55 or higher for Dionysus 2
+* matplotlib for plotting
+* networkx for plotting graphs
+* numpy for loading data and computing
+* sklearn for machine learning algorithms
+* skimage for image processing
+
+To generate the figures in the example of topological features extraction, run `scripts / tda_digits.py`:
+
+```python
+$ cd scripts
+$ ./tda_digits
+```
+
+For details on how to use the functions and classes see jupyter notebooks: `Example.ipynb` and `Classification.ipynb` that are in `scripts` directory.
+
 ## References
 
 [1] Aaron Adcock, Erik Carlsson, Gunnar Carlsson, "The Ring of Algebraic Functions on Persistence Bar Codes", Apr 2013.
