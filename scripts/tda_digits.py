@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 ''' tda_digits.py: Topological features applied to the digits data set.
-
 Author: Marko Lalovic <marko.lalovic@yahoo.com>
 License: MIT License
 '''
@@ -34,7 +33,6 @@ def get_simplices(emb_graph, show=False, save=False):
     ''' Constructs a simplex stream for computing the persistent homology
     using the filtration on the vertices of the graph G corresponding to
     the pixels of the image B.
-
     Filtration is the following. We are adding the vertices and edges to
     the graph G as we sweep across the image B in sweep_direction.
     In this way we get spatial information from the image B.'''
@@ -91,7 +89,6 @@ def get_simplices(emb_graph, show=False, save=False):
 def get_betti_barcodes(simplices, show=False):
     ''' Computes the persistent homology given the simplex stream and
     persistence diagram.
-
     Args:
         simplices::list
             The simplex stream.
@@ -126,13 +123,11 @@ def get_betti_barcodes(simplices, show=False):
 def get_graph(adj_mat, show=False):
     ''' Transforms the given adjacency matrix representation of a graph to
     the (V, E) graph representation.
-
     Args:
         adj_mat::numpy.ndarray
             Graphs adjacency matrix.
         show::bool
             Set to true, if you want to see the drawing of the graph G.
-
     Returns:
         G::networkx.Graph()
             Graph object.
@@ -163,14 +158,12 @@ def get_graph(adj_mat, show=False):
 
 def get_image(n=17, show=False, save=False):
     ''' Loads the image of a handwritten digit from MNIST dataset.
-
     Args:
         n::int
             The number of the handwritten digit image we want,
             e.g. n = 17 for image of number 8.
         show::bool
             Set True, if you want to see the loaded image.
-
     Returns:
         image::numpy.ndarray
             Array of size image_size x image_size.
@@ -194,7 +187,6 @@ def get_image(n=17, show=False, save=False):
 
 def get_binary_image(image, threshold=0, show=False, save=False):
     ''' Produce the binary image B by thresholding the input image A.
-
     Args:
         A::numpy.ndarray
             The image of the handwritten digit.
@@ -202,7 +194,6 @@ def get_binary_image(image, threshold=0, show=False, save=False):
             The threshold for binarization. Default is mean(A)/2.
         show::bool
             Set True, if you want to see the binary image.
-
     Returns:
         B::numpy.ndarray
             The binary image of the handwritten digit.
@@ -228,13 +219,11 @@ def get_binary_image(image, threshold=0, show=False, save=False):
 def get_skeleton(binary_image, show=False, save=False):
     ''' Reduces the binary image to 1 pixel width to expose its topology
     using the Zhang-Suen Thinning algorithm.
-
     Args:
         image::numpy.ndarray
             Array of binary image.
         show::bool
             Set True, if you want to see the skeleton of the image.
-
     Returns:
         skeleton::numpy.ndarray
             Array of the skeleton of the input image.
@@ -257,7 +246,6 @@ def get_skeleton(binary_image, show=False, save=False):
 
 def get_points(skeleton, sweep_direction='top', show=False, save=False):
     ''' Transforms the pixels of skeleton to points.
-
     Args:
         skeleton::numpy.ndarray
             Array of skeleton.
@@ -265,7 +253,6 @@ def get_points(skeleton, sweep_direction='top', show=False, save=False):
             Assumed to be 'right', 'left', 'top' or 'bottom'.
         show::bool
             Set True, if you want to see the points.
-
     Returns:
         points::list
             The points of the skeleton of the handwritten digit of a number
@@ -299,7 +286,6 @@ def get_points(skeleton, sweep_direction='top', show=False, save=False):
 
 def draw_betti_barcodes(intervals, xlim, show=False, save=False):
     ''' Draws the Betti barcodes for dimensions 0 and 1.
-
     Args:
         intervals::dictionary
             Betti barcode intervals for dimensions 0 and 1, for example:
@@ -351,30 +337,6 @@ def draw_betti_barcodes(intervals, xlim, show=False, save=False):
         print('Saving to ../figures: 6_betti-barcodes.png')
         pl.savefig('../figures/6_betti-barcodes.png')
 
-def example(n=17, show=False, save=False):
-    ''' Shows example of feature extraction for image of number 8.'''
-
-    sweep_direction='top'
-
-    image = get_image(n, show, save)
-    binary_image = get_binary_image(image, 0, show, save)
-    skeleton = get_skeleton(binary_image, show, save)
-
-    points = get_points(skeleton, sweep_direction, show, save)
-    point_list = PointList(points)
-    emb_graph = point_list.get_emb_graph(show, save)
-    simplices = get_simplices(emb_graph, show, save)
-
-    intervals = get_betti_barcodes(simplices)
-    draw_betti_barcodes(intervals, image_size, show, save)
-
-    f0 = extract_features(intervals[0])
-    f1 = extract_features(intervals[1])
-    features = f0 + f1
-
-    print('Extracted features: ')
-    print(features)
-
 def extract_features(intervals):
     ''' Extracts 4 features:
         	sum_i { x_i * (y_i - x_i) }
@@ -383,7 +345,6 @@ def extract_features(intervals):
         	sum_i { (y_max - y_i)^2 * (y_i - x_i)^4 }
     From the barcode intervals:
         (x1, y1), (x2, y2), ..., (x_n, y_n);
-
     Args:
         intervals::list
             Betti barcode intervals, for example: [[3.0, inf], [5.0, inf]]
@@ -413,12 +374,10 @@ def extract_features(intervals):
 def extract_all_features(n):
     ''' Extracts features of nth image, all together:
             4 sweeps * (2 barcodes * 4 features) = 32 features
-
         Args:
             n::int
                 The number of the handwritten digit image, for example:
                     n = 17 for image of number 8.
-
         Returns:
             all_features::list
                 The 32 computed features.
@@ -445,7 +404,6 @@ def extract_all_features(n):
 def save_features_matrix(n_samples=1000):
     ''' Saves the feature matrix of shape (n_samples, n_features) to ../data
     directory.
-
     Args:
         n_samples::int
             Number of samples of handwritten digit images.
@@ -460,6 +418,33 @@ def save_features_matrix(n_samples=1000):
     print('Features extracted.')
     np.save('../data/' + 'features_' + str(n_samples) + '.npy', df)
 
+def example(n=17, show=False, save=False):
+    ''' Shows example of feature extraction for image of number 8.'''
+
+    sweep_direction='top'
+
+    image = get_image(n, show, save)
+    binary_image = get_binary_image(image, 0, show, save)
+    skeleton = get_skeleton(binary_image, show, save)
+
+    points = get_points(skeleton, sweep_direction, show, save)
+    point_list = PointList(points)
+    emb_graph = point_list.get_emb_graph(show, save)
+    simplices = get_simplices(emb_graph, show, save)
+
+    intervals = get_betti_barcodes(simplices)
+    draw_betti_barcodes(intervals, image_size, show, save)
+
+    f0 = extract_features(intervals[0])
+    f1 = extract_features(intervals[1])
+    features = f0 + f1
+
+    print('Extracted features: ')
+    print(features)
+
+
 if __name__ == '__main__':
     example(save=True)
     # save_features_matrix()
+    
+ 

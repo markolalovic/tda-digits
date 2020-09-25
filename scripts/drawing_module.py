@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 """ drawing_module.py: A simple 2D drawing module to draw points, edges
 and graphs embedded in the Euclidean plane.
-
 Author: Marko Lalovic <marko.lalovic@yahoo.com>
 License: MIT License
 """
@@ -18,7 +17,6 @@ image_size = 28
 class Point:
     def __init__(self, x=0, y=0, time=-1):
         ''' Class Point for storing coordinates and time of a point creation.
-
         Args:
             x::float
                 The x coordinate of the point.
@@ -130,7 +128,6 @@ def get_edge_of_c3(emb_graph):
 class Edge:
     def __init__(self, p1, p2, time=-1):
         ''' Class Edge for storing edge points and time of the edge creation.
-
         Args:
             p1::Point
                 Edge point.

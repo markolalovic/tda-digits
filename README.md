@@ -1,6 +1,8 @@
 # tda-digits
 This repository contains Python scripts that illustrate the use of computational topology in machine learning. It is an example of topological features extraction to distinguish between images of handwritten digits. The aim of this example is to demonstrate the classification potential of the technique and not to outperform the existing machine learning algorithms for digit classification. For a more interesting example of using this technique on a clinical data set to classify hepatic lesions see [1]. The same approach can be applied to any point cloud data and can be generalized to higher dimensions.
 
+<img src="figures/intro-figure/intro-figure.png" alt="Introduction" width="800">
+
 ## Description
 The main problem we are trying to solve is how to extract the topological features that can be used as an input to standard machine learning algorithms. We use a similar approach as described in [1].
 
@@ -8,7 +10,11 @@ From each image we first construct a graph, where pixels of the image correspond
 
 A pure topological classification cannot distinguish between individual numbers, as the numbers are topologically too similar. For example numbers 1, 2 and 3 are topologically the same if we use this style for writing numbers. Persistent homology, however, gives us more information.
 
-We define a filtration on the vertices of the graph corresponding to the image pixels, adding vertices and edges as we sweep across the image in vertical or horizontal direction. This adds spatial information to the topological features. For example, though 6 and 9 both have a single loop, it will appear at different locations in the filtration.
+We define a filtration on the vertices of the graph corresponding to the image pixels, adding vertices and edges as we sweep across the image in vertical or horizontal direction.
+
+<img src="figures/animation/anim-compressed.gif" alt="Animation" width="800">
+
+This adds spatial information to the topological features. For example, though 6 and 9 both have a single loop, it will appear at different locations in the filtration.
 
 We then compute the persistent homology given the simplex stream from the filtration to get the so-called Betti barcodes. The persistent homology was computed using computational topology package [Dionysus 2](https://github.com/mrzv/dionysus), for more about the package see [2].
 
@@ -72,6 +78,7 @@ Dependencies:
 * numpy for loading data and computing
 * sklearn for machine learning algorithms
 * skimage for image processing
+* mayavi if you want to draw the 3D torus
 
 To generate the figures in the example of topological features extraction, run `scripts / tda_digits.py`:
 
