@@ -78,7 +78,7 @@ Dependencies:
 * numpy for loading data and computing
 * sklearn for machine learning algorithms
 * skimage for image processing
-* mayavi if you want to draw the 3D torus
+* mayavi if you want to draw the torus in 3D
 
 To generate the figures in the example of topological features extraction, run `scripts / tda_digits.py`:
 
