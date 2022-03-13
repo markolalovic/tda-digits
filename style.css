@@ -24,3 +24,14 @@ input {
 .axis3-0 { font-size: 16px; }
 .axis3-1 { font-size: 16px; }
 .legend-text { font-size: 20px; font-weight: lighter;}
+
+.alignright {
+    float: right;
+    font-size: 24px;
+    padding: 0px 17px 0px 7px;
+}
+
+.padding2 {
+    font-size: 24px;
+    padding: 0px 17px 0px 7px;
+}
