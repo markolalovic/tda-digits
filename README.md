@@ -1,6 +1,6 @@
 # Topological features applied to the MNIST data set
 
-**Extraction of topological features that can be used as an input to standard algorithms to obtain qualitative geometric information.**
+**Extraction of topological features that can be used as an input to standard algorithms to obtain qualitative geometric information**
 
 <p align="center">
 <img src="figures/intro-figure/intro-figure-min.png" alt="Intro figure" width="1500">
@@ -10,7 +10,7 @@
 
 This repository contains the source code for a tutorial on application of computational topology in machine learning. To illustrate the use of persistent homology in machine learning we apply it to the MNIST data set of handwritten digits.
 
-You can find the blog post <ins>[here](https://markolalovic.com/blog/tda-digits)</ins> or check the interactive example <ins>[here](https://markolalovic.com/blog/tda-digits)</ins>.
+You can find the blog post <ins>[here](https://markolalovic.com/blog/tda-digits)</ins> or check the interactive example <ins>[here](http://markolalovic.com/tda-digits/)</ins>.
 
 ## Description
 
