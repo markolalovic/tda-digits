@@ -1,0 +1,26 @@
+body {
+  margin-top: 30px;
+  text-align:center;
+  font-family: "Computer Modern Sans", sans-serif;
+  font-size: 20px;
+}
+
+#slider {
+  transform: translate(0px, -400px);
+  z-index: 1;
+}
+
+#range-input {
+  margin: 0;
+  width: 300px;
+}
+
+input {
+  cursor: pointer;
+}
+
+.axis { font-size: 16px; }
+.axis2 { font-size: 16px; }
+.axis3-0 { font-size: 16px; }
+.axis3-1 { font-size: 16px; }
+.legend-text { font-size: 20px; font-weight: lighter;}

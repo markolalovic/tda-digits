@@ -11,10 +11,10 @@ from mpl_toolkits.axes_grid1 import ImageGrid
 
 def draw_mnist(what='digits', show=False, save=False):
     if what == 'digits':
-        images = [mpimg.imread('../mnist-images/original-'
+        images = [mpimg.imread('../figures/mnist-images/original-'
                                 + str(i) + '.png') for i in range(10)]
-    elif what == 'features':
-        images = [mpimg.imread('../mnist-images/graph-'
+    elif what == 'graphs':
+        images = [mpimg.imread('../figures/mnist-images/graph-'
                                 + str(i) + '.png') for i in range(10)]
 
     fig = plt.figure(figsize=(40, 20))
@@ -36,12 +36,12 @@ def draw_mnist(what='digits', show=False, save=False):
     if save:
         if what == 'digits':
             plt.savefig('../figures/mnist-digits.png')
-        elif what == 'features':
-            plt.savefig('../figures/mnist-features.png')
+        elif what == 'graphs':
+            plt.savefig('../figures/mnist-graphs.png')
 
 if __name__ == '__main__':
-    # draw_mnist(what='digits', show=True)
-    draw_mnist(what='features', show=True)
+    draw_mnist(what='digits', show=True)
+    draw_mnist(what='graphs', show=True)
 
-    # draw_mnist(what='digits', save=True)
-    draw_mnist(what='features', save=True)
+    draw_mnist(what='digits', save=True)
+    draw_mnist(what='graphs', save=True)

@@ -5,7 +5,7 @@
    * Load the extracted topological features;
    * Classify the images using SVM with RBF kernel;
    * Evaluate the model using CV on train set and once on test set
-   * Show examples of frequently misclassified images.
+
 '''
 
 from __future__ import print_function # if you are using Python 2
@@ -107,15 +107,3 @@ if __name__ == '__main__':
 
     print('Confusion matrix on test set:\n%s' %
           metrics.confusion_matrix(y_test, predicted))
-
-
-    ##
-    # Examples of misclassified images
-
-
-
-
-
-
-
-    #
