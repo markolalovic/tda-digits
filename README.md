@@ -10,7 +10,7 @@
 
 This repository contains the source code for a tutorial on application of computational topology in machine learning. To illustrate the use of persistent homology in machine learning we apply it to the MNIST data set of handwritten digits.
 
-You can find the blog post <ins>[here](https://markolalovic.com/blog/tda-digits)</ins> or check the interactive example <ins>[here](http://markolalovic.com/tda-digits/)</ins>.
+You can find the blog post <ins>[here](https://markolalovic.github.io/blog/tda-digits)</ins> or check the interactive example <ins>[here](https://markolalovic.github.io/tda-digits/)</ins>.
 
 ## Description
 
