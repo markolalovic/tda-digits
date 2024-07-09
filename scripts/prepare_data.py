@@ -7,7 +7,9 @@ import numpy as np
 from sklearn.datasets import fetch_openml
 import sys
 
-n_samples = 10000
+# better use: n_samples = 10000 
+n_samples = 1000
+
 if len(sys.argv) == 2:
     print('Setting n_samples to: %i' % (n_samples))
     n_samples = int(sys.argv[1])

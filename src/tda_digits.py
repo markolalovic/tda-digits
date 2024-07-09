@@ -19,7 +19,8 @@ import sys
 
 from drawing_module import *
 
-n_samples = 10000 # number of loaded MNIST handwritten digits
+# better use: n_samples = 10000 
+n_samples = 1000 # number of loaded MNIST handwritten digits
 if len(sys.argv) == 2:
     print('Setting n_samples to: %i' % (n_samples))
     n_samples = int(sys.argv[1])

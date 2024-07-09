@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content="Example of extracting topological features"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>tda-digits-example</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+  </head>
+  <body>
+    <div id="chart-window"></div>
+    <div id="slider">
+      <p class="text">
+        <strong>Select threshold value:</strong>
+      </p>
+      <input
+        type="range"
+        step="1"
+        min="0"
+        max="22"
+        value="0"
+        id="range-input"
+      />
+    </div>
+    <div class="alignright">
+      Read more about this demo in:  
+      <a href="https://lalovic.io/blog/tda-digits/">blog post</a>
+    </div>
+    <script src="./digitGraphData.json"></script>
+    <script src="./layoutRect.js"></script>
+    <script src="./appendImages.js"></script>
+    <script src="./digitGraph.js"></script>
+    <script src="./bettiBarcodes.js"></script>
+    <script src="./functions.js"></script>
+    <script src="./main.js"></script>
+  </body>
+</html>
