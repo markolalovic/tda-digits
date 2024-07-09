@@ -1,15 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-''' prepare_data.py: Saves n_samples images of digits to numpy array.'''
+''' prepare_data.py: Saves n_samples = 10000 images of digits to numpy array.'''
 
 from __future__ import print_function # if you are using Python 2
 import numpy as np
 from sklearn.datasets import fetch_openml
 import sys
 
-# better use: n_samples = 10000 
-n_samples = 1000
-
+n_samples = 10000
 if len(sys.argv) == 2:
     print('Setting n_samples to: %i' % (n_samples))
     n_samples = int(sys.argv[1])
