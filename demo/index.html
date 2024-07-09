@@ -11,23 +11,23 @@
   <body>
     <div id="chart-window"></div>
     <div id="slider">
-      <p class="text">
-        <strong>Select threshold value:</strong>
-      </p>
+      <label for="range-input" class="label-text">
+        <strong>Select threshold value: </strong>
+      </label>
       <input
+        name="threshold"
         type="range"
+        id="range-input"        
         step="1"
         min="0"
         max="22"
         value="0"
-        id="range-input"
       />
     </div>
     <div class="alignright">
       Read more about this demo in:  
       <a href="https://lalovic.io/blog/tda-digits/">blog post</a>
     </div>
-    <script src="./digitGraphData.json"></script>
     <script src="./layoutRect.js"></script>
     <script src="./appendImages.js"></script>
     <script src="./digitGraph.js"></script>

@@ -5,6 +5,7 @@ body {
 }
 
 #slider {
+  padding: 30px;
   transform: translate(0px, -400px);
   z-index: 1;
 }
@@ -23,7 +24,7 @@ input {
 .axis3-0 { font-size: 16px; }
 .axis3-1 { font-size: 16px; }
 .legend-text { font-size: 20px; font-weight: lighter;}
-
+.label-text { padding: 10px; }
 .alignright {
     float: right;
     font-size: 24px;
