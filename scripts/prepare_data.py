@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-''' prepare_data.py: Saves n_samples = 10000 images of digits to numpy array.'''
+''' prepare_data.py: Saves n_samples = 10000 images of digits to numpy array. '''
 
 from __future__ import print_function # if you are using Python 2
 import numpy as np

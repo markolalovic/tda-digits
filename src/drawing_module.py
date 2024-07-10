@@ -2,13 +2,12 @@
 # -*- coding: utf-8 -*-
 """ drawing_module.py: A simple 2D drawing module to draw 
 points, edges and graphs embedded in the Euclidean plane.
-Author: Marko Lalovic <marko.lalovic@yahoo.com>
+Author: Marko Lalovic <marko@lalovic.io>
 License: MIT License
 """
 
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
-
 
 canvas_width = 7
 canvas_height = 7

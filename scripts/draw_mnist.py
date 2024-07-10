@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-''' draw_mnist.py: Draws MNIST images and their graph structure.
-'''
+''' draw_mnist.py: Draws MNIST images and their graph structure. '''
 
 from __future__ import print_function # if you are using Python 2
 import numpy as np

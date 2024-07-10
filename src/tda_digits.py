@@ -1,11 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 ''' tda_digits.py: Topological features applied to the digits data set.
-Author: Marko Lalovic <marko.lalovic@yahoo.com>
+Author: Marko Lalovic <marko@lalovic.io>
 License: MIT License
 '''
 
-from __future__ import print_function # if you are using Python 2
 import dionysus as ds
 import networkx as nx
 import numpy as np
@@ -19,7 +18,6 @@ import sys
 
 from drawing_module import *
 
-# better use: n_samples = 10000 
 n_samples = 1000 # number of loaded MNIST handwritten digits
 if len(sys.argv) == 2:
     print('Setting n_samples to: %i' % (n_samples))
