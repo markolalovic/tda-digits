@@ -41,7 +41,7 @@ $ cd src
 $ python3 tda_digits.py
 ```
 
-This generates figures for digit 8, which can be found in the example directory.
+This generates figures for digit 8, which can be found in the [notebooks](notebooks) directory.
 
 ### Usage Details
 
