@@ -31,7 +31,7 @@ To get the data, run the `prepare_data.py` script:
 cd scripts
 python3 prepare_data.py
 ```
-This script downloads and saves 10,000 images of digits as NumPy arrays `X_10000.npy` and `y_10000.npy` in the data directory.
+This script downloads and saves 10,000 images of digits as NumPy arrays `X_10000.npy` and `y_10000.npy` in the [data](data) directory.
 
 ### Feature Extraction
 To extract the features, run the `tda_digits.py` script:
@@ -41,11 +41,11 @@ $ cd src
 $ python3 tda_digits.py
 ```
 
-This generates figures for digit 8, which can be found in the [notebooks](notebooks) directory.
+This generates figures for digit 8, which can be found in the [example](figures/example) directory.
 
 ### Usage Details
 
-For detailed instructions on using the functions and classes, refer to the Jupyter notebooks: `Example.ipynb` and `Classification.ipynb` located in the scripts directory.
+For detailed instructions on using the functions and classes, refer to the Jupyter notebooks: `Example.ipynb` and `Classification.ipynb` located in the [notebooks](notebooks) directory.
 
 ## References
 
